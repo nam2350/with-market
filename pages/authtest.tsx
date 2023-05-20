@@ -3,19 +3,21 @@ import useSWR from "swr";
 import Layout from "@/components/layout";
 import FloatingButton from "@/components/floating-button";
 import Item from "@/components/item";
-import { Product } from "@prisma/client";
+import withAuth from "@/components/withAuth"
+import {Product, JoinProduct} from "@prisma/client"
 
-interface productWithJoin extends Product {
-  _count: { joinProducts: number };
+interface joinProductWithProduct extends Product{
+  joinProducts: JoinProduct[]
 }
+
 interface getAllProducts {
   message?: string;
-  products: productWithJoin[];
+  products: joinProductWithProduct[];
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-const Home: NextPage = () => {
+const AuthTest: NextPage = () => {
   const { data, error } = useSWR<getAllProducts>(
     "/api/products/getAllProducts",
     fetcher
@@ -28,6 +30,7 @@ const Home: NextPage = () => {
 
   return (
     <Layout title="HOME" hasTabBar>
+      <div>auth HOC 테스트</div>
       <div className="flex flex-col space-y-5 divide-y">
         {data.products?.map((product) => (
           <Item
@@ -37,7 +40,7 @@ const Home: NextPage = () => {
             price={product.price}
             people={product.people}
             id={product.id}
-            join={product._count.joinProducts}
+            join={product.joinProducts.length}
             isFullJoin={product.isFullJoin}
           />
         ))}
@@ -63,4 +66,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default withAuth(AuthTest);
