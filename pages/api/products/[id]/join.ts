@@ -21,17 +21,17 @@ export default async function handler(
 
   const { productId } = req.body;
   const userId = (session as UserSession).id;
-  
+
   if (isNaN(productId) || !userId) {
     res.status(400).json({ message: "Invalid product id or user id." });
     return;
   }
   try {
-    const newJoin = await client.joinProduct.create({
+    const newMember = await client.member.create({
       data: {
         product: {
           connect: {
-            id: Number(productId)
+            id: Number(productId),
           },
         },
         user: {
@@ -42,14 +42,14 @@ export default async function handler(
       },
     });
 
-    res.status(200).json({ message: "success", newJoin });
+    res.status(200).json({ message: "success", newMember });
   } catch (error) {
     if (error instanceof Error) {
       console.error(error);
       return res
         .status(500)
-        .json({ message: "Failed to create join.", error: error.message });
+        .json({ message: "Failed to create member.", error: error.message });
     }
-    return res.status(500).json({ message: "Failed to create join." });
+    return res.status(500).json({ message: "Failed to create member." });
   }
 }

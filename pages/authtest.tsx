@@ -4,15 +4,16 @@ import Layout from "@/components/layout";
 import FloatingButton from "@/components/floating-button";
 import Item from "@/components/item";
 import withAuth from "@/components/withAuth"
-import {Product, JoinProduct} from "@prisma/client"
+import {Product, Member} from "@prisma/client"
 
-interface joinProductWithProduct extends Product{
-  joinProducts: JoinProduct[]
+interface membertWithProduct extends Product{
+  members: Member[]
 }
 
 interface getAllProducts {
   message?: string;
-  products: joinProductWithProduct[];
+  products: membertWithProduct[];
+  isFull?: boolean;
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -40,8 +41,7 @@ const AuthTest: NextPage = () => {
             price={product.price}
             people={product.people}
             id={product.id}
-            join={product.joinProducts.length}
-            isFullJoin={product.isFullJoin}
+            join={product.members.length}
           />
         ))}
         <FloatingButton href="/products/upload">

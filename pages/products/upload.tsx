@@ -32,18 +32,9 @@ const Upload: NextPage = () => {
       },
     })
       .then((res) => res.json())
-      .then(async function (data) {
+      .then((data) => {
         console.log("POST로 보낸 상품데이터", data);
-        await fetch("/api/products/join", {
-          method: "POST",
-          body: JSON.stringify({ productId: data.newProduct?.id }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((res) => res.json())
-          .then((data) => console.log("join data", data));
-        router.push("/");
+        router.push('/');
       });
   };
   return (

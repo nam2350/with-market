@@ -6,8 +6,8 @@ interface ItemProps {
   price: number;
   people: number;
   id: number;
-  join: number;
-  isFullJoin: boolean;
+  join?: number;
+  isFull?:boolean;
 }
 
 export default function Item({
@@ -17,7 +17,8 @@ export default function Item({
   people,
   id,
   join,
-  isFullJoin
+  isFull
+  
 }: ItemProps) {
   return (
     <Link
@@ -33,7 +34,7 @@ export default function Item({
         </div>
       </div>
       <div className="flex space-x-2 items-end justify-end">
-        {isFullJoin ? (<div className="px-2  bg-gray-400">
+        {isFull ? (<div className="px-2  bg-gray-400">
           <span className="text-xs text-white ">참여 완료</span>
         </div>) : null}
         <div className="flex space-x-0.5 items-center text-sm text-gray-600">

@@ -8,25 +8,28 @@ import Button from "@/components/button";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Session } from "next-auth";
-import { Product, JoinProduct, User} from '@prisma/client'
+import { Product, Member, User} from '@prisma/client'
 
 interface UserSession extends Session {
   id?: string;
 }
 
-interface JoinwithUser extends JoinProduct{
+interface memberwithUser extends Member{
   user:User
 }
 
-interface productWithJoin extends Product {
+interface productWithMember extends Product {
   user: User;
-  joinProducts: JoinwithUser[];
+  members: memberwithUser[];
 }
 
 interface getProductData {
   message?: string;
-  product: productWithJoin;
+  product: productWithMember;
+  isFull: boolean;
+  joinMember:number;
   relatedProducts: Product[];
+  
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -35,34 +38,13 @@ const ItemDetail: NextPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const { data: session, status } = useSession();
-  const [isFull, setIsFull] = useState(false);
 
   const { data, error } = useSWR<getProductData>(
     id ? `/api/products/${id}` : null,
     fetcher
   );
 
-  useEffect(() => {
-    if (data && data.product.people <= data.product.joinProducts.length) {
-      setIsFull(true);
-    } else {
-      setIsFull(false);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (isFull) {
-      fetch(`/api/products/update/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isFullJoin: isFull }),
-      })
-        .then((res) => res.json())
-        .then((data) => console.log("update data", data));
-    }
-  }, [isFull, id]);
+  
 
   if (error) return <div>Error loading product...</div>;
   if (!data) return <div>Loading...</div>;
@@ -74,13 +56,13 @@ const ItemDetail: NextPage = () => {
     } else if ((session as UserSession).id === data.product.userId) {
       alert("이미 참여 하셨습니다");
       return;
-    }
-    if (isFull) {
-      alert("참여 인원이 꽉 찾습니다.");
+    } else if(data.isFull) {
+      alert("참여가 완료 되었습니다.");
       return;
-    }
+    } 
+    
 
-    await fetch("/api/products/join", {
+    await fetch("/api/products/{$id}/join", {
       method: "POST",
       body: JSON.stringify({ productId }),
       headers: {
@@ -94,9 +76,8 @@ const ItemDetail: NextPage = () => {
       });
   };
 
-  console.log("참여중인 사람", data.product.joinProducts);
+  // console.log("참여중인 사람", data.product.members);
   console.log("개별 상품 데이터", data);
-  console.log("isFull", isFull);
 
   return (
     <Layout canGoBack>
@@ -123,7 +104,7 @@ const ItemDetail: NextPage = () => {
                 <div className="p-3 flex items-center space-x-1.5">
                   <span className="text-gray-600 text-lg">WITH</span>
                   <span className="text-primaryB-400 text-lg">
-                    {`${data?.product?.joinProducts?.length} / ${data?.product?.people}`}
+                    {`${data?.joinMember} / ${data?.product?.people}`}
                   </span>
                 </div>
                 <button className="p-3 rounded-md flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-500 cursor-pointer">
@@ -161,23 +142,34 @@ const ItemDetail: NextPage = () => {
             </div>
             <Button
               size="md"
-              text={isFull ? "참여 완료" : "참여 하기"}
-              isFull={isFull}
+              text= {data.isFull ? '참여 완료' : '참여 하기'}
               onClick={() => join(String(id))}
             />
             <div>
               <p className=" my-6 text-gray-700">참여 중인 사람</p>
-              {data?.product?.joinProducts?.map((joinProduct) => (
-                <div key={joinProduct.id} className="flex items-center mt-5">
+              <div className="flex items-center mt-5">
                   <Image
-                    src={joinProduct.user.image || ''}
+                    src={data.product?.user.image || ''}
                     className="w-12 h-12 rounded-full bg-slate-300 mr-2"
                     alt="profile image"
                     width={50}
                     height={50}
                   />
                   <p className="text-sm font-medium text-gray-700">
-                    {joinProduct.user.name}
+                    {data.product?.user.name}
+                  </p>
+                </div>
+              {data?.product?.members?.map((member) => (
+                <div key={member.id} className="flex items-center mt-5">
+                  <Image
+                    src={member.user.image || ''}
+                    className="w-12 h-12 rounded-full bg-slate-300 mr-2"
+                    alt="profile image"
+                    width={50}
+                    height={50}
+                  />
+                  <p className="text-sm font-medium text-gray-700">
+                    {member.user.name}
                   </p>
                 </div>
               ))}

@@ -6,11 +6,11 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { id } = req.query;
-  const { isFullJoin } = req.body;
+  const { isFull } = req.body;
   try {
     const updatedProduct = await client.product.update({
       where: { id: Number(id) },
-      data: { isFullJoin },
+      data: { isFull },
     });
 
     res.status(200).json({ message: "success", updatedProduct });

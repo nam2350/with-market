@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import client from "@/libs/server/client";
-// import { getServerSession } from "next-auth";
-// import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,12 +13,21 @@ export default async function handler(
       include: {
         _count: {
           select: {
-            joinProducts: true,
+            members: true,
           },
         },
       },
     });
-    res.status(200).json({ message: "success", products });
+    const productsWithJoinMember = products.map((product: any) => {
+      const joinMember = 1 + product._count.members;
+      const isFull = product.people <= joinMember
+      return {
+        ...product,
+        joinMember,
+        isFull
+      };
+    });
+    res.status(200).json({ message: "success", products: productsWithJoinMember });
   } catch (error) {
     return res.status(500).json({ message: "Failed to fetch products." });
   }

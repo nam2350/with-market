@@ -7,41 +7,29 @@ import { Session } from "next-auth";
 interface UserSession extends Session {
   id?: string;
 }
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const session = await getServerSession(req, res, authOptions);
-
-
-
   if (!session) {
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
+  const userId = (session as UserSession).id;
+
   try {
-    const { name, place, price, people, description } = req.body;
-
-    const newProduct = await client.product.create({
-      data: {
-        image: "",
-        name,
-        price: Number(price),
-        place,
-        people: Number(people),
-        description,
-        user: {
-          connect: {
-            id: (session as UserSession).id,
-          },
-        },
+    const user = await client.user.findUnique({
+      where: {
+        id: userId,
       },
-    })
-    
-
-    res.status(200).json({ message: "success", newProduct });
+      include: {
+        products: true,
+        member: true
+      },
+    });
+    res.status(200).json({ message: "success", user });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to create product." });
+    return res.status(500).json({ message: "Failed to get user info." });
   }
 }

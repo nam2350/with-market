@@ -5,12 +5,14 @@ import FloatingButton from "@/components/floating-button";
 import Item from "@/components/item";
 import { Product } from "@prisma/client";
 
-interface productWithJoin extends Product {
-  _count: { joinProducts: number };
+interface productWithMember extends Product {
+  _count: { members: number };
+  joinMember: number;
+  isFull: boolean;
 }
 interface getAllProducts {
   message?: string;
-  products: productWithJoin[];
+  products: productWithMember[];
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -37,8 +39,8 @@ const Home: NextPage = () => {
             price={product.price}
             people={product.people}
             id={product.id}
-            join={product._count.joinProducts}
-            isFullJoin={product.isFullJoin}
+            join={product.joinMember}
+            isFull={product.isFull}
           />
         ))}
         <FloatingButton href="/products/upload">
