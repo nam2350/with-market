@@ -20,17 +20,20 @@ const Search: NextPage = () => {
   const [keyWord, setKeyWord] = useState<string>("");
   const debouncedKeyword = useDebounce(keyWord);
 
-  const { data } = useSWR<getProductData>(
+  const { data, error } = useSWR<getProductData>(
     !!debouncedKeyword ? `/api/search?keyword=${debouncedKeyword}` : null,
     {
       revalidateOnFocus: false,
     }
   );
+  if (error) return <div>Error loading mypage...</div>;
+  if (!data) return <div>Loading...</div>;
+
   const handleSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyWord(e.target.value);
   };
 
-  console.log(data)
+  console.log(data);
 
   return (
     <Layout title="검색" hasTabBar>
