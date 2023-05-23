@@ -47,7 +47,7 @@ export default async function handler(
         const isFull = like.product.people <= joinMember;
         like.product.joinMember = joinMember;
         like.product.isFull = isFull;
-        return like;
+        return like.product;
       });
     res.status(200).json({ message: "success", likes: likesWithJoinMember });
   } catch (error) {

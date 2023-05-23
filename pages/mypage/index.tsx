@@ -5,24 +5,17 @@ import NotLogin from "@/components/not-login";
 import NextImage from "next/image";
 import withAuth from "@/components/withAuth";
 import { useState } from "react";
-import { User, Product, Member } from "@prisma/client";
 import useSWR from "swr";
 import Item from "@/components/item";
 
-type Status = "withme" | "withyou" | "favs";
+type State = "withme" | "withyou" | "favs";
 
-interface userWithMember extends User {
-  member: Member;
-}
-interface userWithProduct extends User {
-  products: Product;
-}
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const MyWith: NextPage = () => {
-  const { data: session, status } = useSession();
-  const [state, setState] = useState<Status>("withme");
+  const { data: session } = useSession();
+  const [state, setState] = useState<State>("withme");
 
   const { data, error } = useSWR(`/api/mypage/${state}`, fetcher);
 
@@ -31,7 +24,7 @@ const MyWith: NextPage = () => {
 
   console.log(`${state} data`, data);
 
-  const handleClick = (currentStatus: Status) => {
+  const handleClick = (currentStatus: State) => {
     setState(currentStatus);
   };
 
@@ -171,34 +164,34 @@ const MyWith: NextPage = () => {
       )}
       {state === "withyou" && (
         <div className="px-4 mt-6">
-          {data.members?.map((product) => (
+          {data.members?.map((member) => (
             <Item
-              key={product.product.id}
-              name={product.product.name}
-              place={product.product.place}
-              price={product.product.price}
-              people={product.product.people}
-              id={product.product.id}
-              join={product.product.joinMember}
-              likes={product.product._count.favs}
-              isFull={product.product.isFull}
+              key={member.id}
+              name={member.name}
+              place={member.place}
+              price={member.price}
+              people={member.people}
+              id={member.id}
+              join={member.joinMember}
+              likes={member._count.favs}
+              isFull={member.isFull}
             />
           ))}
         </div>
       )}
       {state === "favs" && (
         <div className="px-4 mt-6">
-          {data.likes?.map((product) => (
+          {data.likes?.map((like) => (
             <Item
-              key={product.product.id}
-              name={product.product.name}
-              place={product.product.place}
-              price={product.product.price}
-              people={product.product.people}
-              id={product.product.id}
-              join={product.product.joinMember}
-              likes={product.product._count.favs}
-              isFull={product.product.isFull}
+              key={like.id}
+              name={like.name}
+              place={like.place}
+              price={like.price}
+              people={like.people}
+              id={like.id}
+              join={like.joinMember}
+              likes={like._count.favs}
+              isFull={like.isFull}
             />
           ))}
         </div>

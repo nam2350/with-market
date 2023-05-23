@@ -49,12 +49,12 @@ export default async function handler(
       const isFull = member.product.people <= joinMember;
       member.product.joinMember = joinMember;
       member.product.isFull = isFull;
-      return member;
+      return member.product;
     });
     res
       .status(200)
-      .json({ message: "success", members: membersWithJoinMember });
+      .json({ message: "success", members: membersWithJoinMember});
   } catch (error) {
-    return res.status(500).json({ message: "Failed to get 참여목록." });
+    return res.status(500).json({ message: "Failed to get WITH YOU info." });
   }
 }
