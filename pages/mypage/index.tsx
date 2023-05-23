@@ -11,6 +11,7 @@ import Item from "@/components/item";
 type State = "withme" | "withyou" | "favs";
 
 
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const MyWith: NextPage = () => {
@@ -147,7 +148,7 @@ const MyWith: NextPage = () => {
       </div>
       {state === "withme" && (
         <div className="px-4 mt-6">
-          {data.products?.map((product) => (
+          {data.products?.map((product: any) => (
             <Item
               key={product.id}
               name={product.name}
@@ -164,7 +165,7 @@ const MyWith: NextPage = () => {
       )}
       {state === "withyou" && (
         <div className="px-4 mt-6">
-          {data.members?.map((member) => (
+          {data.members?.map((member: any) => (
             <Item
               key={member.id}
               name={member.name}
@@ -181,7 +182,7 @@ const MyWith: NextPage = () => {
       )}
       {state === "favs" && (
         <div className="px-4 mt-6">
-          {data.likes?.map((like) => (
+          {data.likes?.map((like: any) => (
             <Item
               key={like.id}
               name={like.name}
