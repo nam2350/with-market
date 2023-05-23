@@ -9,7 +9,7 @@ import { User, Product, Member } from "@prisma/client";
 import useSWR from "swr";
 import Item from "@/components/item";
 
-type Status = "WITH ME" | "WITH YOU" | "관심목록";
+type Status = "withme" | "withyou" | "favs";
 
 interface userWithMember extends User {
   member: Member;
@@ -17,28 +17,22 @@ interface userWithMember extends User {
 interface userWithProduct extends User {
   products: Product;
 }
-interface getUserInfo {
-  message?: string;
-  user: User;
-  products: userWithProduct[];
-  member: userWithMember[];
-}
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const MyWith: NextPage = () => {
   const { data: session, status } = useSession();
-  const [activeButton, setActiveButton] = useState<Status>("WITH ME");
+  const [state, setState] = useState<Status>("withme");
 
-  const { data, error } = useSWR<getUserInfo>("/api/user/getUser", fetcher);
+  const { data, error } = useSWR(`/api/mypage/${state}`, fetcher);
 
-  if (error) return <div>Error loading products...</div>;
+  if (error) return <div>Error loading mypage...</div>;
   if (!data) return <div>Loading...</div>;
 
-  console.log(data);
+  console.log(`${state} data`, data);
 
   const handleClick = (currentStatus: Status) => {
-    setActiveButton(currentStatus);
+    setState(currentStatus);
   };
 
   return (
@@ -62,11 +56,11 @@ const MyWith: NextPage = () => {
         <div className="mt-10 flex justify-around">
           <div
             className="flex flex-col items-center cursor-pointer"
-            onClick={() => handleClick("WITH ME")}
+            onClick={() => handleClick("withme")}
           >
             <div
               className={`w-14 h-14 text-white ${
-                activeButton === "WITH ME" ? "bg-primaryB-400" : "bg-gray-400"
+                state === "withme" ? "bg-primaryB-400" : "bg-gray-400"
               } rounded-full flex items-center justify-center`}
             >
               <svg
@@ -86,9 +80,7 @@ const MyWith: NextPage = () => {
             </div>
             <span
               className={`text-sm mt-2 font-medium ${
-                activeButton === "WITH ME"
-                  ? "text-primaryB-400"
-                  : "text-gray-400"
+                state === "withme" ? "text-primaryB-400" : "text-gray-400"
               }`}
             >
               WITH ME
@@ -96,11 +88,11 @@ const MyWith: NextPage = () => {
           </div>
           <div
             className="flex flex-col items-center cursor-pointer"
-            onClick={() => handleClick("WITH YOU")}
+            onClick={() => handleClick("withyou")}
           >
             <div
               className={`w-14 h-14 text-white ${
-                activeButton === "WITH YOU" ? "bg-primaryB-400" : "bg-gray-400"
+                state === "withyou" ? "bg-primaryB-400" : "bg-gray-400"
               } rounded-full flex items-center justify-center`}
             >
               <svg
@@ -120,9 +112,7 @@ const MyWith: NextPage = () => {
             </div>
             <span
               className={`text-sm mt-2 font-medium ${
-                activeButton === "WITH YOU"
-                  ? "text-primaryB-400"
-                  : "text-gray-400"
+                state === "withyou" ? "text-primaryB-400" : "text-gray-400"
               }`}
             >
               WITH YOU
@@ -130,11 +120,11 @@ const MyWith: NextPage = () => {
           </div>
           <div
             className="flex flex-col items-center cursor-pointer"
-            onClick={() => handleClick("관심목록")}
+            onClick={() => handleClick("favs")}
           >
             <div
               className={`w-14 h-14 text-white ${
-                activeButton === "관심목록" ? "bg-primaryB-400" : "bg-gray-400"
+                state === "favs" ? "bg-primaryB-400" : "bg-gray-400"
               } rounded-full flex items-center justify-center`}
             >
               <svg
@@ -154,9 +144,7 @@ const MyWith: NextPage = () => {
             </div>
             <span
               className={`text-sm mt-2 font-medium ${
-                activeButton === "관심목록"
-                  ? "text-primaryB-400"
-                  : "text-gray-400"
+                state === "favs" ? "text-primaryB-400" : "text-gray-400"
               }`}
             >
               관심목록
@@ -164,9 +152,9 @@ const MyWith: NextPage = () => {
           </div>
         </div>
       </div>
-      {activeButton === "WITH ME" && (
+      {state === "withme" && (
         <div className="px-4 mt-6">
-          {data.user?.products.map((product) => (
+          {data.products?.map((product) => (
             <Item
               key={product.id}
               name={product.name}
@@ -175,15 +163,46 @@ const MyWith: NextPage = () => {
               people={product.people}
               id={product.id}
               join={product.joinMember}
+              likes={product._count.favs}
               isFull={product.isFull}
             />
           ))}
         </div>
       )}
-      {activeButton === "WITH YOU" && (
-        <div className="px-4 mt-6">내가 참여한 목록</div>
+      {state === "withyou" && (
+        <div className="px-4 mt-6">
+          {data.members?.map((product) => (
+            <Item
+              key={product.product.id}
+              name={product.product.name}
+              place={product.product.place}
+              price={product.product.price}
+              people={product.product.people}
+              id={product.product.id}
+              join={product.product.joinMember}
+              likes={product.product._count.favs}
+              isFull={product.product.isFull}
+            />
+          ))}
+        </div>
       )}
-      {activeButton === "관심목록" && <div className="px-4 mt-6">관심목록</div>}
+      {state === "favs" && (
+        <div className="px-4 mt-6">
+          {data.likes?.map((product) => (
+            <Item
+              key={product.product.id}
+              name={product.product.name}
+              place={product.product.place}
+              price={product.product.price}
+              people={product.product.people}
+              id={product.product.id}
+              join={product.product.joinMember}
+              likes={product.product._count.favs}
+              isFull={product.product.isFull}
+            />
+          ))}
+        </div>
+      )}
     </Layout>
   );
 };

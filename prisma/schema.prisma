@@ -21,6 +21,7 @@ model User {
   sessions      Session[]
   products      Product[]
   member        Member[]
+  fav           Fav[]
 }
 
 model Account {
@@ -71,6 +72,7 @@ model Product {
   description   String   @db.MediumText
   members       Member[]
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favs          Fav[]
 }
 
 model Member {
@@ -81,4 +83,14 @@ model Member {
   userId       String
   product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId    Int
+}
+
+model Fav {
+  id           Int      @id @default(autoincrement())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId    Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

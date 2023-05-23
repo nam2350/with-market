@@ -6,7 +6,7 @@ import Item from "@/components/item";
 import { Product } from "@prisma/client";
 
 interface productWithMember extends Product {
-  _count: { members: number };
+  _count: { members: number, favs: number };
   joinMember: number;
   isFull: boolean;
 }
@@ -40,6 +40,7 @@ const Home: NextPage = () => {
             people={product.people}
             id={product.id}
             join={product.joinMember}
+            likes={product._count.favs}
             isFull={product.isFull}
           />
         ))}

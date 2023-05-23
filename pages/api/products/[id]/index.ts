@@ -1,5 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import client from "@/libs/server/client";
+import { Session } from "next-auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]";
+interface UserSession extends Session {
+  id?: string;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -8,6 +14,9 @@ export default async function handler(
   const {
     query: { id },
   } = req;
+
+  const session = await getServerSession(req, res, authOptions);
+  const userId = (session as UserSession).id;
 
   try {
     const product = await client.product.findUnique({
@@ -27,16 +36,15 @@ export default async function handler(
             user: true,
           },
         },
-        _count:{
-          select:{
+        _count: {
+          select: {
             members: true,
-          }
-        }
+          },
+        },
       },
     });
     const joinMember = product._count ? 1 + product._count.members : 1;
     const isFull = product.people <= joinMember;
-    console.log(product.people, joinMember, isFull )
 
     const terms = product?.name
       .split(" ")
@@ -51,11 +59,26 @@ export default async function handler(
         },
       },
     });
-    res
-      .status(200)
-      .json({ message: "success", product, isFull, joinMember, relatedProducts });
+    const isLiked = Boolean(
+      await client.fav.findFirst({
+        where: {
+          productId: product?.id,
+          userId: userId,
+        },
+        select: {
+          id: true,
+        },
+      })
+    );
+    res.status(200).json({
+      message: "success",
+      product,
+      isFull,
+      isLiked,
+      joinMember,
+      relatedProducts,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Failed to get product." });
   }
-
 }

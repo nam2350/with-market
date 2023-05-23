@@ -24,8 +24,20 @@ export default async function handler(
         id: userId,
       },
       include: {
-        products: true,
-        member: true
+        products: {
+          include: {
+            members: {
+              include: {
+                product: true
+              }
+            }
+          }
+        },
+        member: {
+          include: {
+            product: true
+          }
+        }
       },
     });
     res.status(200).json({ message: "success", user });

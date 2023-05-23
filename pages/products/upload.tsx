@@ -23,7 +23,6 @@ const Upload: NextPage = () => {
   const router = useRouter();
 
   const onValid = async (productData: UploadProductForm) => {
-    console.log("시작");
     await fetch("/api/products/add", {
       method: "POST",
       body: JSON.stringify(productData),
