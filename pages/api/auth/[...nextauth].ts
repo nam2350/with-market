@@ -1,15 +1,9 @@
-import NextAuth, {  NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google"
-import client  from '@/libs/server/client'
+import NextAuth, { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import client from "@/libs/server/client";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { Session } from "next-auth/";
 
-
-interface UserSession extends Session {
-  id: string;
-}
 export const authOptions: NextAuthOptions = {
-  // Configure one or more authentication providers
   adapter: PrismaAdapter(client),
   providers: [
     GoogleProvider({
@@ -18,10 +12,34 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    session: async ({ session, user }) => {
-      (session as UserSession).id = user.id;
-      return Promise.resolve(session as UserSession);
+    // token에서 user id를 받아옴
+    jwt({ token, account, profile }: any) {
+      if (account) {
+        console.log("token", token);
+        token.accessToken = account.access_token;
+        token.id = profile.id;
+      }
+      return token;
     },
+    // token으로 받아온 user id를 session으로 넣어줌
+    session({ session, token }: any) {
+      session.accessToken = token.accessToken;
+      console.log("token2", token);
+      session.id = token.sub;
+      return session;
+    },
+    // 로그인이 되면 '/'으로 redirect
+    redirect({baseUrl}) {
+      return baseUrl;
+    }
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  // middleware를 사용하기 위한 설정
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/enter",
   },
 };
 

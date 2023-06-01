@@ -14,7 +14,6 @@ export default async function handler(
         _count: {
           select: {
             members: true,
-            favs: true
           },
         },
       },

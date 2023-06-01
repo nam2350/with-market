@@ -1,29 +1,31 @@
 import type { NextPage } from "next";
 import Layout from "@/components/layout";
 import { useSession } from "next-auth/react";
-import NotLogin from "@/components/not-login";
 import NextImage from "next/image";
-import withAuth from "@/components/withAuth";
 import { useState } from "react";
 import useSWR from "swr";
 import Item from "@/components/item";
+// import NotLogin from "@/components/not-login";
+// import withAuth from "@/components/withAuth";
 
 type State = "withme" | "withyou" | "favs";
-
-
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const MyWith: NextPage = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [state, setState] = useState<State>("withme");
 
   const { data, error } = useSWR(`/api/mypage/${state}`, fetcher);
 
   if (error) return <div>Error loading mypage...</div>;
   if (!data) return <div>Loading...</div>;
+  if (status === "unauthenticated") {
+    return <p>Access Denied</p>;
+  }
 
   console.log(`${state} data`, data);
+  console.log(`session`, session);
 
   const handleClick = (currentStatus: State) => {
     setState(currentStatus);
@@ -201,4 +203,4 @@ const MyWith: NextPage = () => {
   );
 };
 
-export default withAuth(MyWith);
+export default MyWith;

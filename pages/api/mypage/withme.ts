@@ -17,6 +17,8 @@ export default async function handler(
     return;
   }
   const userId = (session as UserSession).id;
+  console.log("userId",userId)
+  console.log("session",session)
 
   try {
     const products = await client.product.findMany({
@@ -53,6 +55,7 @@ export default async function handler(
       .status(200)
       .json({ message: "success", products: productsWithJoinMember });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to get WITH ME info." });
+    console.log(error)
+    return res.status(500).json({message : 'failed to get with me info'});
   }
 }

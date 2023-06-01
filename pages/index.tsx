@@ -4,6 +4,7 @@ import Layout from "@/components/layout";
 import FloatingButton from "@/components/floating-button";
 import Item from "@/components/item";
 import { Product } from "@prisma/client";
+import { getToken } from "next-auth/jwt";
 
 interface productWithMember extends Product {
   _count: { members: number, favs: number };

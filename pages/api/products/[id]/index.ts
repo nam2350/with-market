@@ -18,6 +18,7 @@ export default async function handler(
   const session = await getServerSession(req, res, authOptions);
   const userId = (session as UserSession).id;
 
+  
   try {
     const product = await client.product.findUnique({
       where: {
@@ -79,6 +80,6 @@ export default async function handler(
       relatedProducts,
     });
   } catch (error) {
-    return res.status(500).json({ message: "Failed to get product." });
+    return res.status(500).json({ message: "Failed to get product detail." });
   }
 }

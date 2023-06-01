@@ -44,12 +44,6 @@ export default async function handler(
 
     res.status(200).json({ message: "success", newMember });
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(error);
-      return res
-        .status(500)
-        .json({ message: "Failed to create member.", error: error.message });
-    }
     return res.status(500).json({ message: "Failed to create member." });
   }
 }

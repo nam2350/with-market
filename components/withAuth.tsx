@@ -9,16 +9,24 @@ export default function withAuth<P extends object>(
     const router = useRouter();
     const { data: session, status } = useSession();
 
-    useEffect(() => {
-      if (status === "loading") return;
-      if (!session) { 
-        router.push("/enter"); 
-      }
-    }, [session, status, router]);
-
-    if (status === "loading" || !session) {
-      return <div>Loading...</div>; 
+    // useEffect(() => {
+    //   if (status === 'unauthenticated') {
+    //     router.push("/enter");
+    //   }
+    //   if (!session) {
+    //     router.push("/enter");
+    //   }
+    // }, [session, status, router]);
+    if (status === 'unauthenticated') {
+      router.push("/enter");
     }
+    if (!session) {
+      router.push("/enter");
+    }
+
+    // if (status === "loading" || !session) {
+    //   return <div>Loading...</div>;
+    // }
 
     return <Component {...props} />;
   };

@@ -6,7 +6,7 @@ import Input from "@/components/input";
 import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import withAuth from "@/components/withAuth";
+// import withAuth from "@/components/withAuth";
 
 interface UploadProductForm {
   name: string;
@@ -109,4 +109,4 @@ const Upload: NextPage = () => {
   );
 };
 
-export default withAuth(Upload);
+export default Upload;

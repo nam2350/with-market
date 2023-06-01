@@ -24,7 +24,6 @@ export default function Enter() {
           <div>환영합니다. {session.user?.name}</div>
           <div>Email : {session.user?.email}</div>
           <NextImage
-            
             src={
               session.user?.image ||
               "https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/7r5X/image/9djEiPBPMLu_IvCYyvRPwmZkM1g.jpg"

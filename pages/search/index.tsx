@@ -20,20 +20,20 @@ const Search: NextPage = () => {
   const [keyWord, setKeyWord] = useState<string>("");
   const debouncedKeyword = useDebounce(keyWord);
 
-  const { data, error } = useSWR<getProductData>(
-    !!debouncedKeyword ? `/api/search?keyword=${debouncedKeyword}` : null,
-    {
-      revalidateOnFocus: false,
-    }
-  );
-  if (error) return <div>Error loading mypage...</div>;
-  if (!data) return <div>Loading...</div>;
+  // const { data, error } = useSWR<getProductData>(
+  //   !!debouncedKeyword ? `/api/search?keyword=${debouncedKeyword}` : null,
+  //   {
+  //     revalidateOnFocus: false,
+  //   }
+  // );
+  // if (error) return <div>Error loading mypage...</div>;
+  // if (!data) return <div>Loading...</div>;
 
   const handleSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
     setKeyWord(e.target.value);
   };
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <Layout title="검색" hasTabBar>
@@ -81,7 +81,7 @@ const Search: NextPage = () => {
         </div>
       </div>
       <div className="flex flex-col space-y-5 divide-y">
-        {data?.products?.map((product) => (
+        {/* {data?.products?.map((product) => (
           <Item
             key={product.id}
             name={product.name}
@@ -90,7 +90,7 @@ const Search: NextPage = () => {
             people={product.people}
             id={product.id}
           />
-        ))}
+        ))} */}
       </div>
     </Layout>
   );

@@ -89,6 +89,7 @@ const ItemDetail: NextPage = () => {
 
   // console.log("참여중인 사람", data.product.members);
   console.log("개별 상품 데이터", data);
+  console.log(`session`, session);
 
   return (
     <Layout canGoBack>
